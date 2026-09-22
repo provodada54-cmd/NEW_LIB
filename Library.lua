@@ -1347,6 +1347,10 @@ local function New(ClassName, Properties)
     return Instance
 end
 
+function Library:Create(ClassName, Properties)
+    return New(ClassName, Properties)
+end
+
 local function SafeParentUI(Instance, Parent)
     local success, _error = pcall(function()
         if not Parent then
