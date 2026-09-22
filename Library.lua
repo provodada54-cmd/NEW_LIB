@@ -5197,7 +5197,7 @@ function Library:AddToggle(Idx, Info)
     })
 
     local SwitchStroke = Library:Create("UIStroke", {
-        ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+        ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
         Color = Color3.fromRGB(60, 60, 60),
         Thickness = 1,
         Parent = SwitchBG
