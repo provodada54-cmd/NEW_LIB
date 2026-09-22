@@ -6459,227 +6459,6 @@ function Library:Notify(Text, Time)
     end)
 end
 
-function Library:SetWatermark(Text)
-    if not Library.WatermarkFrame then
-        Library.WatermarkFrame = Library:Create("Frame", {
-            BackgroundColor3 = Color3.fromRGB(24, 24, 24),
-            Position = UDim2.new(0, 15, 0, 15),
-            Size = UDim2.new(0, 0, 0, 26),
-            Visible = false,
-            Parent = Library.ScreenGui
-        })
-
-        Library:Create("UICorner", {
-            CornerRadius = UDim.new(0, 6),
-            Parent = Library.WatermarkFrame
-        })
-
-        Library:Create("UIStroke", {
-            ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
-            Color = Color3.fromRGB(50, 50, 50),
-            Thickness = 1,
-            Parent = Library.WatermarkFrame
-        })
-
-        Library.WatermarkLabel = Library:Create("TextLabel", {
-            BackgroundTransparency = 1,
-            Position = UDim2.new(0, 10, 0, 0),
-            Size = UDim2.new(1, -20, 1, 0),
-            Font = Enum.Font.GothamMedium,
-            Text = "",
-            TextColor3 = Color3.fromRGB(220, 220, 220),
-            TextSize = 12,
-            TextXAlignment = Enum.TextXAlignment.Center,
-            Parent = Library.WatermarkFrame
-        })
-    end
-
-    Library.WatermarkLabel.Text = Text
-    local Width = Library.WatermarkLabel.TextBounds.X + 20
-    Library.WatermarkFrame.Size = UDim2.new(0, Width, 0, 26)
-end
-
-function Library:SetWatermarkVisibility(Visible)
-    if Library.WatermarkFrame then
-        Library.WatermarkFrame.Visible = Visible
-    end
-end
-
-function Library:CreateKeybindFrame()
-    local Frame = Library:Create("Frame", {
-        BackgroundColor3 = Color3.fromRGB(24, 24, 24),
-        Position = UDim2.new(0, 15, 0.5, -100),
-        Size = UDim2.new(0, 200, 0, 30),
-        Visible = false,
-        Parent = Library.ScreenGui
-    })
-
-    Library:Create("UICorner", {
-        CornerRadius = UDim.new(0, 6),
-        Parent = Frame
-    })
-
-    Library:Create("UIStroke", {
-        ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
-        Color = Color3.fromRGB(50, 50, 50),
-        Thickness = 1,
-        Parent = Frame
-    })
-
-    local Top = Library:Create("Frame", {
-        BackgroundTransparency = 1,
-        Size = UDim2.new(1, 0, 0, 30),
-        Parent = Frame
-    })
-
-    Library:Create("TextLabel", {
-        BackgroundTransparency = 1,
-        Position = UDim2.new(0, 10, 0, 0),
-        Size = UDim2.new(1, -20, 1, 0),
-        Font = Enum.Font.GothamBold,
-        Text = "Keybinds",
-        TextColor3 = Color3.fromRGB(220, 220, 220),
-        TextSize = 12,
-        TextXAlignment = Enum.TextXAlignment.Left,
-        Parent = Top
-    })
-
-    local Container = Library:Create("Frame", {
-        BackgroundTransparency = 1,
-        Position = UDim2.new(0, 10, 0, 30),
-        Size = UDim2.new(1, -20, 0, 0),
-        Parent = Frame
-    })
-
-    local List = Library:Create("UIListLayout", {
-        Padding = UDim.new(0, 4),
-        SortOrder = Enum.SortOrder.LayoutOrder,
-        Parent = Container
-    })
-
-    List:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-        Container.Size = UDim2.new(1, -20, 0, List.AbsoluteContentSize.Y)
-        Frame.Size = UDim2.new(0, 200, 0, List.AbsoluteContentSize.Y + 36)
-    end)
-
-    Library:MakeDraggable(Frame)
-    Library.KeybindFrame = Frame
-    Library.KeybindContainer = Container
-end
-
-function Library:SetKeybindFrameVisibility(Visible)
-    if not Library.KeybindFrame then
-        Library:CreateKeybindFrame()
-    end
-    Library.KeybindFrame.Visible = Visible
-end
-
-function Library:Add3DGrid(Container, Info)
-    local GridObj = {
-        Items = Info.Items or {},
-        Callback = Info.Callback or function() end,
-        Selected = nil
-    }
-
-    local GridFrame = Library:Create("Frame", {
-        BackgroundTransparency = 1,
-        Size = UDim2.new(1, 0, 0, Info.Height or 200),
-        Parent = Container
-    })
-
-    local Scroll = Library:Create("ScrollingFrame", {
-        BackgroundTransparency = 1,
-        Size = UDim2.new(1, 0, 1, 0),
-        CanvasSize = UDim2.new(0, 0, 0, 0),
-        ScrollBarThickness = 3,
-        ScrollBarImageColor3 = Color3.fromRGB(80, 80, 80),
-        Parent = GridFrame
-    })
-
-    local UIGrid = Library:Create("UIGridLayout", {
-        CellPadding = UDim2.new(0, 6, 0, 6),
-        CellSize = UDim2.new(0, Info.ItemSize or 60, 0, Info.ItemSize or 60),
-        SortOrder = Enum.SortOrder.LayoutOrder,
-        Parent = Scroll
-    })
-
-    UIGrid:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-        Scroll.CanvasSize = UDim2.new(0, 0, 0, UIGrid.AbsoluteContentSize.Y + 6)
-    end)
-
-    local ViewportCache = {}
-
-    local function RenderItem(ItemData, ItemFrame)
-        if ViewportCache[ItemData] then return end
-
-        local Viewport = Library:Create("ViewportFrame", {
-            BackgroundTransparency = 1,
-            Size = UDim2.new(1, 0, 1, 0),
-            Parent = ItemFrame
-        })
-
-        local Camera = Instance.new("Camera")
-        Viewport.CurrentCamera = Camera
-        Camera.Parent = Viewport
-
-        if ItemData.Model then
-            local ModelCopy = ItemData.Model:Clone()
-            ModelCopy.Parent = Viewport
-
-            local Primary = ModelCopy.PrimaryPart or ModelCopy:FindFirstChildWhichIsA("BasePart")
-            if Primary then
-                local Pos = Primary.Position
-                Camera.CFrame = CFrame.new(Pos + Vector3.new(0, 1.5, 3.5), Pos)
-            end
-        end
-
-        ViewportCache[ItemData] = Viewport
-    end
-
-    for _, ItemData in ipairs(GridObj.Items) do
-        local ItemBtn = Library:Create("TextButton", {
-            BackgroundColor3 = Color3.fromRGB(32, 32, 32),
-            Size = UDim2.new(1, 0, 1, 0),
-            Text = "",
-            Parent = Scroll
-        })
-
-        Library:Create("UICorner", {
-            CornerRadius = UDim.new(0, 6),
-            Parent = ItemBtn
-        })
-
-        local Stroke = Library:Create("UIStroke", {
-            ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
-            Color = Color3.fromRGB(50, 50, 50),
-            Thickness = 1,
-            Parent = ItemBtn
-        })
-
-        ItemBtn.MouseButton1Click:Connect(function()
-            GridObj.Selected = ItemData
-            GridObj.Callback(ItemData)
-        end)
-
-        RenderItem(ItemData, ItemBtn)
-    end
-
-    return GridObj
-end
-
-function Library:Unload()
-    if Library.ScreenGui then
-        Library.ScreenGui:Destroy()
-    end
-
-    for _, Signal in pairs(Library.Signals or {}) do
-        if Signal and Signal.Disconnect then
-            Signal:Disconnect()
-        end
-    end
-end
-
-
 function Library:SetWatermarkVisibility(Visible)
     if Library.Watermark then
         Library.Watermark.Visible = Visible
@@ -6810,13 +6589,13 @@ function Library:CreateWindow(Info, ...)
                             if typeof(TextOrInfo) == "table" then
                                 local Text = TextOrInfo.Text or "Button"
                                 local Callback = TextOrInfo.Func or TextOrInfo.Callback or function() end
-                                local Obj = OldAddBtn(Groupbox, Text, Callback)
+                                local Obj = OldAddBtn(Groupbox, { Text = Text, Func = Callback })
                                 if TextOrInfo.Tooltip and Obj and Obj.AddTooltip then
                                     Obj:AddTooltip(TextOrInfo.Tooltip)
                                 end
                                 return Obj
                             end
-                            return OldAddBtn(Groupbox, TextOrInfo, Func)
+                            return OldAddBtn(Groupbox, { Text = TextOrInfo, Func = Func })
                         end
                     end
 
@@ -6827,6 +6606,8 @@ function Library:CreateWindow(Info, ...)
                                 Info = Idx
                                 Idx = Info.Flag or Info.Text or "Toggle"
                             end
+                            Info = Info or {}
+                            Info.Text = Info.Text or Idx
                             return OldAddToggle(Groupbox, Idx, Info)
                         end
                     end
@@ -6838,6 +6619,8 @@ function Library:CreateWindow(Info, ...)
                                 Info = Idx
                                 Idx = Info.Flag or Info.Text or "Slider"
                             end
+                            Info = Info or {}
+                            Info.Text = Info.Text or Idx
                             return OldAddSlider(Groupbox, Idx, Info)
                         end
                     end
@@ -6849,6 +6632,8 @@ function Library:CreateWindow(Info, ...)
                                 Info = Idx
                                 Idx = Info.Flag or Info.Text or "Input"
                             end
+                            Info = Info or {}
+                            Info.Text = Info.Text or Idx
                             return OldAddInput(Groupbox, Idx, Info)
                         end
                     end
@@ -6860,6 +6645,8 @@ function Library:CreateWindow(Info, ...)
                                 Info = Idx
                                 Idx = Info.Flag or Info.Text or "Dropdown"
                             end
+                            Info = Info or {}
+                            Info.Text = Info.Text or Idx
                             return OldAddDropdown(Groupbox, Idx, Info)
                         end
                     end
@@ -6867,6 +6654,9 @@ function Library:CreateWindow(Info, ...)
                     local OldAddLabel = Groupbox.AddLabel
                     if OldAddLabel then
                         function Groupbox:AddLabel(Text, DoesWrap)
+                            if typeof(Text) == "table" then
+                                Text = Text.Text or ""
+                            end
                             local LabelObj = OldAddLabel(Groupbox, Text, DoesWrap)
                             if typeof(LabelObj) == "table" then
                                 function LabelObj:AddColorPicker(Idx, Info)
@@ -6884,18 +6674,27 @@ function Library:CreateWindow(Info, ...)
                 end
 
                 function Tab:AddLeftGroupbox(Title)
-                    if Tab.AddGroupbox then
-                        return WrapGroupbox(Tab:AddGroupbox({ Side = 1, Name = Title }))
+                    local TitleText = typeof(Title) == "table" and (Title.Name or Title.Text) or Title
+                    if Tab.LeftContainer then
+                        return WrapGroupbox(Library:AddGroupbox(Tab.LeftContainer, TitleText))
+                    elseif Tab.AddGroupbox then
+                        return WrapGroupbox(Tab:AddGroupbox({ Side = 1, Name = TitleText }))
                     end
                 end
+
                 function Tab:AddRightGroupbox(Title)
-                    if Tab.AddGroupbox then
-                        return WrapGroupbox(Tab:AddGroupbox({ Side = 2, Name = Title }))
+                    local TitleText = typeof(Title) == "table" and (Title.Name or Title.Text) or Title
+                    if Tab.RightContainer then
+                        return WrapGroupbox(Library:AddGroupbox(Tab.RightContainer, TitleText))
+                    elseif Tab.AddGroupbox then
+                        return WrapGroupbox(Tab:AddGroupbox({ Side = 2, Name = TitleText }))
                     end
                 end
+
                 function Tab:AddLeftTabbox(Title)
-                    if Tab.AddTabbox then
-                        local Tabbox = Tab:AddTabbox({ Side = 1, Name = Title })
+                    local TitleText = typeof(Title) == "table" and (Title.Name or Title.Text) or Title
+                    if Tab.LeftContainer then
+                        local Tabbox = Library:AddTabbox(Tab.LeftContainer, TitleText)
                         if Tabbox and Tabbox.AddTab then
                             local OldTabboxAddTab = Tabbox.AddTab
                             function Tabbox:AddTab(SubTitle)
@@ -6905,9 +6704,11 @@ function Library:CreateWindow(Info, ...)
                         return Tabbox
                     end
                 end
+
                 function Tab:AddRightTabbox(Title)
-                    if Tab.AddTabbox then
-                        local Tabbox = Tab:AddTabbox({ Side = 2, Name = Title })
+                    local TitleText = typeof(Title) == "table" and (Title.Name or Title.Text) or Title
+                    if Tab.RightContainer then
+                        local Tabbox = Library:AddTabbox(Tab.RightContainer, TitleText)
                         if Tabbox and Tabbox.AddTab then
                             local OldTabboxAddTab = Tabbox.AddTab
                             function Tabbox:AddTab(SubTitle)
