@@ -1831,6 +1831,25 @@ function Library:MakeDraggable(UI, DragFrame, IgnoreToggled, IsMainWindow, SnapC
 end
 
 function Library:MakeResizable(UI, DragFrame, Callback)
+    local MinSize = Vector2.new(300, 200)
+    local Handle = DragFrame
+
+    if typeof(DragFrame) == "Vector2" then
+        MinSize = DragFrame
+        Handle = nil
+    end
+
+    if not Handle or typeof(Handle) ~= "Instance" then
+        Handle = UI:FindFirstChild("ResizeHandle") or Library:Create("Frame", {
+            Name = "ResizeHandle",
+            AnchorPoint = Vector2.new(1, 1),
+            BackgroundTransparency = 1,
+            Position = UDim2.new(1, 0, 1, 0),
+            Size = UDim2.new(0, 16, 0, 16),
+            Parent = UI
+        })
+    end
+
     local StartPos
     local FrameSize
     local Dragging = false
@@ -1838,7 +1857,7 @@ function Library:MakeResizable(UI, DragFrame, Callback)
     local InputBegan
     local InputChanged
 
-    InputBegan = DragFrame.InputBegan:Connect(function(Input)
+    InputBegan = Handle.InputBegan:Connect(function(Input)
         if not IsClickInput(Input) then
             return
         end
@@ -1870,9 +1889,9 @@ function Library:MakeResizable(UI, DragFrame, Callback)
             local Delta = Input.Position - StartPos
             UI.Size = UDim2.new(
                 FrameSize.X.Scale,
-                math.clamp(FrameSize.X.Offset + Delta.X, Library.MinSize.X, math.huge),
+                math.clamp(FrameSize.X.Offset + Delta.X, MinSize.X, math.huge),
                 FrameSize.Y.Scale,
-                math.clamp(FrameSize.Y.Offset + Delta.Y, Library.MinSize.Y, math.huge)
+                math.clamp(FrameSize.Y.Offset + Delta.Y, MinSize.Y, math.huge)
             )
             if Callback then
                 Library:SafeCallback(Callback)
@@ -1902,19 +1921,6 @@ function Library:MakeResizable(UI, DragFrame, Callback)
             table.remove(Library.Signals, IdxBegan)
         end
     end)
-end
-
-function Library:MakeCover(Holder, Place)
-    local Pos = Places[Place] or { 0, 0 }
-    local Size = Sizes[Place] or { 1, 0.5 }
-    local Cover = New("Frame", {
-        AnchorPoint = Vector2.new(Pos[1], Pos[2]),
-        BackgroundColor3 = Holder.BackgroundColor3,
-        Position = UDim2.fromScale(Pos[1], Pos[2]),
-        Size = UDim2.fromScale(Size[1], Size[2]),
-        Parent = Holder,
-    })
-    return Cover
 end
 
 function Library:MakeLine(Frame, Info)
