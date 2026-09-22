@@ -1081,5 +1081,7 @@ function SaveManager:BuildConfigSection(Tab, IconName)
     return ConfigurationBox
 end
 
+SaveManager.LoadAutoload = SaveManager.LoadAutoloadConfig
+
 SaveManager:BuildFolderTree()
 return SaveManager
