@@ -1686,6 +1686,7 @@ local function GetSnapGuideOffset(Name, SnappedValue, ElemDimension)
 end
 
 function Library:MakeDraggable(UI, DragFrame, IgnoreToggled, IsMainWindow, SnapConfig)
+    DragFrame = DragFrame or UI
     local StartPos
     local FramePos
     local Dragging = false
