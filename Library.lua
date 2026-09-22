@@ -5197,7 +5197,7 @@ function Library:AddToggle(Idx, Info)
     })
 
     local SwitchStroke = Library:Create("UIStroke", {
-        ApplyStrokeMode = Enum.UIStrokeMode.Border,
+        ApplyStrokeMode = Enum.ApplyStrokeMode.Border
         Color = Color3.fromRGB(60, 60, 60),
         Thickness = 1,
         Parent = SwitchBG
@@ -5285,7 +5285,7 @@ function Library:AddButton(Info)
     })
 
     local Stroke = Library:Create("UIStroke", {
-        ApplyStrokeMode = Enum.UIStrokeMode.Border,
+        ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
         Color = Color3.fromRGB(55, 55, 55),
         Thickness = 1,
         Parent = Outer
@@ -5507,7 +5507,7 @@ function Library:AddInput(Idx, Info)
     })
 
     local Stroke = Library:Create("UIStroke", {
-        ApplyStrokeMode = Enum.UIStrokeMode.Border,
+        ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
         Color = Color3.fromRGB(55, 55, 55),
         Thickness = 1,
         Parent = BoxBG
@@ -5598,7 +5598,7 @@ function Library:AddDropdown(Idx, Info)
     })
 
     local Stroke = Library:Create("UIStroke", {
-        ApplyStrokeMode = Enum.UIStrokeMode.Border,
+        ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
         Color = Color3.fromRGB(55, 55, 55),
         Thickness = 1,
         Parent = BoxBG
@@ -5648,7 +5648,7 @@ function Library:AddDropdown(Idx, Info)
     })
 
     local MenuStroke = Library:Create("UIStroke", {
-        ApplyStrokeMode = Enum.UIStrokeMode.Border,
+        ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
         Color = Color3.fromRGB(60, 60, 60),
         Thickness = 1,
         Parent = MenuContainer
@@ -5978,7 +5978,7 @@ function Library:AddGroupbox(Container, Title)
     })
 
     Library:Create("UIStroke", {
-        ApplyStrokeMode = Enum.UIStrokeMode.Border,
+        ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
         Color = Color3.fromRGB(45, 45, 45),
         Thickness = 1,
         Parent = BoxFrame
@@ -6052,7 +6052,7 @@ function Library:AddTabbox(Container, Title)
     })
 
     Library:Create("UIStroke", {
-        ApplyStrokeMode = Enum.UIStrokeMode.Border,
+        ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
         Color = Color3.fromRGB(45, 45, 45),
         Thickness = 1,
         Parent = BoxFrame
@@ -6182,7 +6182,7 @@ function Library:CreateWindow(Info)
     })
 
     Library:Create("UIStroke", {
-        ApplyStrokeMode = Enum.UIStrokeMode.Border,
+        ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
         Color = Color3.fromRGB(45, 45, 45),
         Thickness = 1,
         Parent = MainFrame
@@ -6399,7 +6399,7 @@ function Library:Notify(Text, Time)
     })
 
     local Stroke = Library:Create("UIStroke", {
-        ApplyStrokeMode = Enum.UIStrokeMode.Border,
+        ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
         Color = Color3.fromRGB(50, 50, 50),
         Thickness = 1,
         Parent = NotifFrame
@@ -6457,7 +6457,7 @@ function Library:SetWatermark(Text)
         })
 
         Library:Create("UIStroke", {
-            ApplyStrokeMode = Enum.UIStrokeMode.Border,
+            ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
             Color = Color3.fromRGB(50, 50, 50),
             Thickness = 1,
             Parent = Library.WatermarkFrame
@@ -6502,7 +6502,7 @@ function Library:CreateKeybindFrame()
     })
 
     Library:Create("UIStroke", {
-        ApplyStrokeMode = Enum.UIStrokeMode.Border,
+        ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
         Color = Color3.fromRGB(50, 50, 50),
         Thickness = 1,
         Parent = Frame
@@ -6632,7 +6632,7 @@ function Library:Add3DGrid(Container, Info)
         })
 
         local Stroke = Library:Create("UIStroke", {
-            ApplyStrokeMode = Enum.UIStrokeMode.Border,
+            ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
             Color = Color3.fromRGB(50, 50, 50),
             Thickness = 1,
             Parent = ItemBtn
