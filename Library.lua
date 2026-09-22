@@ -219,6 +219,17 @@ local Library = {
     Toggle = nil
 }
 
+function Library:Create(ClassName, Properties)
+    if New then
+        return New(ClassName, Properties)
+    end
+    local Inst = Instance.new(ClassName)
+    for Prop, Val in pairs(Properties or {}) do
+        Inst[Prop] = Val
+    end
+    return Inst
+end
+
 if RunService:IsStudio() then
     if UserInputService.TouchEnabled and not UserInputService.MouseEnabled then
         Library.IsMobile = true
