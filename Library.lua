@@ -6679,6 +6679,21 @@ function Library:Unload()
     end
 end
 
+
+function Library:SetWatermarkVisibility(Visible)
+    if Library.Watermark then
+        Library.Watermark.Visible = Visible
+    elseif Library.WatermarkFrame then
+        Library.WatermarkFrame.Visible = Visible
+    end
+end
+
+function Library:SetKeybindFrameVisibility(Visible)
+    if Library.KeybindFrame then
+        Library.KeybindFrame.Visible = Visible
+    end
+end
+
 function Library:Add3DGrid(Container, Info)
     local GridObj = {
         Items = Info.Items or {},
@@ -6686,10 +6701,15 @@ function Library:Add3DGrid(Container, Info)
         Selected = nil
     }
 
+    local ParentContainer = Container
+    if typeof(Container) == "table" and Container.Container then
+        ParentContainer = Container.Container
+    end
+
     local GridFrame = Library:Create("Frame", {
         BackgroundTransparency = 1,
         Size = UDim2.new(1, 0, 0, Info.Height or 200),
-        Parent = Container
+        Parent = ParentContainer
     })
 
     local Scroll = Library:Create("ScrollingFrame", {
@@ -6772,44 +6792,129 @@ function Library:Add3DGrid(Container, Info)
     return GridObj
 end
 
-function Library:SetKeybindFrameVisibility(Visible)
-    if Library.KeybindFrame then
-        Library.KeybindFrame.Visible = Visible
-    end
-end
-
-function Library:SetWatermarkVisibility(Visible)
-    if Library.Watermark then
-        Library.Watermark.Visible = Visible
-    end
-end
-
-local OldCreateWindow = Library.CreateWindow
-function Library:CreateWindow(...)
-    local Window = OldCreateWindow(self, ...)
-    if Window and Window.AddTab then
-        local OldAddTab = Window.AddTab
+local OriginalCreateWindow = Library.CreateWindow
+function Library:CreateWindow(Info, ...)
+    local Window = OriginalCreateWindow(self, Info, ...)
+    if Window then
+        local OriginalAddTab = Window.AddTab
         function Window:AddTab(Name, ...)
-            local Tab = OldAddTab(Window, Name, ...)
+            local Tab = OriginalAddTab(Window, Name, ...)
             if Tab then
+                local function WrapGroupbox(Groupbox)
+                    if not Groupbox or Groupbox._Wrapped then return Groupbox end
+                    Groupbox._Wrapped = true
+
+                    local OldAddBtn = Groupbox.AddButton
+                    if OldAddBtn then
+                        function Groupbox:AddButton(TextOrInfo, Func)
+                            if typeof(TextOrInfo) == "table" then
+                                local Text = TextOrInfo.Text or "Button"
+                                local Callback = TextOrInfo.Func or TextOrInfo.Callback or function() end
+                                local Obj = OldAddBtn(Groupbox, Text, Callback)
+                                if TextOrInfo.Tooltip and Obj and Obj.AddTooltip then
+                                    Obj:AddTooltip(TextOrInfo.Tooltip)
+                                end
+                                return Obj
+                            end
+                            return OldAddBtn(Groupbox, TextOrInfo, Func)
+                        end
+                    end
+
+                    local OldAddToggle = Groupbox.AddToggle
+                    if OldAddToggle then
+                        function Groupbox:AddToggle(Idx, Info)
+                            if typeof(Idx) == "table" then
+                                Info = Idx
+                                Idx = Info.Flag or Info.Text or "Toggle"
+                            end
+                            return OldAddToggle(Groupbox, Idx, Info)
+                        end
+                    end
+
+                    local OldAddSlider = Groupbox.AddSlider
+                    if OldAddSlider then
+                        function Groupbox:AddSlider(Idx, Info)
+                            if typeof(Idx) == "table" then
+                                Info = Idx
+                                Idx = Info.Flag or Info.Text or "Slider"
+                            end
+                            return OldAddSlider(Groupbox, Idx, Info)
+                        end
+                    end
+
+                    local OldAddInput = Groupbox.AddInput
+                    if OldAddInput then
+                        function Groupbox:AddInput(Idx, Info)
+                            if typeof(Idx) == "table" then
+                                Info = Idx
+                                Idx = Info.Flag or Info.Text or "Input"
+                            end
+                            return OldAddInput(Groupbox, Idx, Info)
+                        end
+                    end
+
+                    local OldAddDropdown = Groupbox.AddDropdown
+                    if OldAddDropdown then
+                        function Groupbox:AddDropdown(Idx, Info)
+                            if typeof(Idx) == "table" then
+                                Info = Idx
+                                Idx = Info.Flag or Info.Text or "Dropdown"
+                            end
+                            return OldAddDropdown(Groupbox, Idx, Info)
+                        end
+                    end
+
+                    local OldAddLabel = Groupbox.AddLabel
+                    if OldAddLabel then
+                        function Groupbox:AddLabel(Text, DoesWrap)
+                            local LabelObj = OldAddLabel(Groupbox, Text, DoesWrap)
+                            if typeof(LabelObj) == "table" then
+                                function LabelObj:AddColorPicker(Idx, Info)
+                                    return Groupbox:AddColorPicker(Idx, Info)
+                                end
+                                function LabelObj:AddKeyPicker(Idx, Info)
+                                    return Groupbox:AddKeyPicker(Idx, Info)
+                                end
+                            end
+                            return LabelObj
+                        end
+                    end
+
+                    return Groupbox
+                end
+
                 function Tab:AddLeftGroupbox(Title)
                     if Tab.AddGroupbox then
-                        return Tab:AddGroupbox({ Side = "Left", Name = Title })
+                        return WrapGroupbox(Tab:AddGroupbox({ Side = 1, Name = Title }))
                     end
                 end
                 function Tab:AddRightGroupbox(Title)
                     if Tab.AddGroupbox then
-                        return Tab:AddGroupbox({ Side = "Right", Name = Title })
+                        return WrapGroupbox(Tab:AddGroupbox({ Side = 2, Name = Title }))
                     end
                 end
                 function Tab:AddLeftTabbox(Title)
                     if Tab.AddTabbox then
-                        return Tab:AddTabbox({ Side = "Left", Name = Title })
+                        local Tabbox = Tab:AddTabbox({ Side = 1, Name = Title })
+                        if Tabbox and Tabbox.AddTab then
+                            local OldTabboxAddTab = Tabbox.AddTab
+                            function Tabbox:AddTab(SubTitle)
+                                return WrapGroupbox(OldTabboxAddTab(Tabbox, SubTitle))
+                            end
+                        end
+                        return Tabbox
                     end
                 end
                 function Tab:AddRightTabbox(Title)
                     if Tab.AddTabbox then
-                        return Tab:AddTabbox({ Side = "Right", Name = Title })
+                        local Tabbox = Tab:AddTabbox({ Side = 2, Name = Title })
+                        if Tabbox and Tabbox.AddTab then
+                            local OldTabboxAddTab = Tabbox.AddTab
+                            function Tabbox:AddTab(SubTitle)
+                                return WrapGroupbox(OldTabboxAddTab(Tabbox, SubTitle))
+                            end
+                        end
+                        return Tabbox
                     end
                 end
             end
