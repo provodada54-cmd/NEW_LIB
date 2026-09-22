@@ -230,6 +230,17 @@ function Library:Create(ClassName, Properties)
     return Inst
 end
 
+function Library:Tween(Instance, Properties, Duration, Style, Direction)
+    local Info = TweenInfo.new(
+        Duration or 0.2,
+        Style or Enum.EasingStyle.Quart,
+        Direction or Enum.EasingDirection.Out
+    )
+    local Anim = TweenService:Create(Instance, Info, Properties)
+    Anim:Play()
+    return Anim
+end
+
 if RunService:IsStudio() then
     if UserInputService.TouchEnabled and not UserInputService.MouseEnabled then
         Library.IsMobile = true
