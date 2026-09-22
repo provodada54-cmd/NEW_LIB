@@ -44,11 +44,11 @@ function SaveManager:IgnoreThemeSettings()
     })
 end
 
-function SaveManager:SetIgnoreIndexes(List) {
+function SaveManager:SetIgnoreIndexes(List)
     for _, Key in ipairs(List) do
         self.Ignore[Key] = true
     end
-}
+end
 
 function SaveManager:BuildFolderTree()
     local Paths = {
@@ -154,17 +154,26 @@ end
 
 function SaveManager:RefreshConfigList()
     local List = {}
-    local Files = listfiles(self.Folder .. "/settings")
-
-    for _, File in ipairs(Files) do
-        if File:sub(-5) == ".json" then
-            local Pos = File:find("%.json$")
-            local Name = File:sub(#self.Folder + 11, Pos - 1)
-            table.insert(List, Name)
+    if isfolder(self.Folder .. "/settings") then
+        local Files = listfiles(self.Folder .. "/settings")
+        for _, File in ipairs(Files) do
+            if File:sub(-5) == ".json" then
+                local Pos = File:find("%.json$")
+                local Name = File:sub(#self.Folder + 11, Pos - 1)
+                table.insert(List, Name)
+            end
         end
     end
-
     return List
+end
+
+function SaveManager:LoadAutoload()
+    if isfile(self.Folder .. "/settings/autoload.txt") then
+        local Name = readfile(self.Folder .. "/settings/autoload.txt")
+        if isfile(self.Folder .. "/settings/" .. Name .. ".json") then
+            self:Load(Name)
+        end
+    end
 end
 
 function SaveManager:BuildConfigSection(Tab)
@@ -237,12 +246,7 @@ function SaveManager:BuildConfigSection(Tab)
         Default = false
     })
 
-    if isfile(self.Folder .. "/settings/autoload.txt") then
-        local Name = readfile(self.Folder .. "/settings/autoload.txt")
-        if isfile(self.Folder .. "/settings/" .. Name .. ".json") then
-            self:Load(Name)
-        end
-    end
+    self:LoadAutoload()
 
     AutoLoadToggle:OnChanged(function(Value)
         if Value then
