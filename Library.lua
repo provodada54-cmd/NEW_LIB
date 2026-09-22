@@ -1479,20 +1479,6 @@ if OnlineFetchIcons and OnlineIcons then
     Library:SetIconModule(OnlineIcons)
 end
 
-function Library.Cursor:ResetCross() end
-function Library.Cursor:ResetIcon() end
-function Library.Cursor:ResetCursor() end
-function Library.Cursor:ChangeCrossColor() end
-function Library.Cursor:ChangeIcon() end
-function Library.Cursor:ChangeIconColor() end
-function Library.Cursor:ChangeIconSize() end
-function Library:ChangeCursorCrossColor() end
-function Library:ResetCursorCross() end
-function Library:ChangeCursorIcon() end
-function Library:ChangeCursorIconColor() end
-function Library:ChangeCursorIconSize() end
-function Library:ResetCursorIcon() end
-
 function Library:GetBetterColor(Color, Add)
     Add = Add * (Library.IsLightTheme and -4 or 2)
     return Color3.fromRGB(
